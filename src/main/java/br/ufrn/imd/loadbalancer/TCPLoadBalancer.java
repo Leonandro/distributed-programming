@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class TCPLoadBalancer {
 
@@ -22,6 +23,9 @@ public class TCPLoadBalancer {
 	    
 	    
 	    serverSocket = new ServerSocket(4443);
+	    AtomicIntegerArray serversStatus = new AtomicIntegerArray (2);
+	    serversStatus.set(0, 1);
+	    serversStatus.set(1, 1);
 		
 		System.out.println("[INFO]: Load Balancer initialized on port 4443");
 	    
