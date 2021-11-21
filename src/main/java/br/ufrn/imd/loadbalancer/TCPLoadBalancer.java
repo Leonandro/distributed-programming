@@ -26,10 +26,9 @@ public class TCPLoadBalancer {
 		System.out.println("[INFO]: Load Balancer initialized on port 4443");
 	    
 	    while (true) {
+	    	System.out.println("[INFO]: Waiting for one connection");
 	    	clientSocket = serverSocket.accept();
 	    	new Thread (new Dispatcher(clientSocket)).start();
-	    	
-	    	
 	    }
 	}
 

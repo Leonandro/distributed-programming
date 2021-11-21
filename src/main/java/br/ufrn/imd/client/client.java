@@ -21,10 +21,14 @@ public class client {
 		
 		serverOutput.println("MILK, RICE, PEPPER");
 		serverOutput.flush();
+		System.out.println(serverInput.readLine());
 		serverOutput.println("RICE, RICE, PEPPER");
 		serverOutput.flush();
+		System.out.println(serverInput.readLine());
 		serverOutput.println("PEPPER, RICE, PEPPER");
 		serverOutput.flush();
+		System.out.println(serverInput.readLine());
+		msg = sc.nextLine();
 		serverOutput.println("END");
 		serverOutput.flush();
 		

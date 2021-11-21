@@ -51,22 +51,23 @@ public class Dispatcher implements Runnable {
 				clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				
 				String msg = "DISPATCHER, INIT";
+				String serverResponse = "";
 				
-//				!(msg = clientInput.readLine()).equalsIgnoreCase("END")
 				while(true) {
-					System.out.println(msg);
+					msg = clientInput.readLine();
+					
+					System.out.println("[INFO]: Dispatching this data " + msg + " to the server");
 					if(msg.equalsIgnoreCase("END")) {
 						break;
 					}
 					this.serversOutputs[this.serverIndex].println(msg);
 					this.serversOutputs[this.serverIndex].flush();
-//					String serverMsg = this.serversInputs[this.serverIndex].readLine();
-//					clientOutput.print(serverMsg);
-					msg = clientInput.readLine();
+					serverResponse = this.serversInputs[this.serverIndex].readLine();
+					clientOutput.println(serverResponse);
+					clientOutput.flush();
+					
 				}
 				
-//				serverOutput.close();
-//				serverInput.close();
 				clientOutput.close();
 				clientInput.close();
 				this.serversOutputs[this.serverIndex].close();
