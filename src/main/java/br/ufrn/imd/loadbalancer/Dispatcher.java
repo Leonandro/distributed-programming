@@ -36,13 +36,8 @@ public class Dispatcher implements Runnable {
 	
 	public void run() {
 		// TODO Auto-generated method stub
-		BufferedReader serverInput, clientInput;
-		PrintWriter serverOutput, clientOutput;
-		int index = 0;
-		System.out.println("[INFO]: The dispatcher is running");
-		
-		
-		//this.serversOutputs[0].println("TCFLB2");
+		BufferedReader  clientInput;
+		PrintWriter  clientOutput;
 		System.out.println("[INFO]: The server is free on index: " + this.serverIndex);
 		
 		if(this.serverIndex != -1) {
@@ -52,26 +47,35 @@ public class Dispatcher implements Runnable {
 				
 				String msg = "DISPATCHER, INIT";
 				String serverResponse = "";
-				
-				while(true) {
+				boolean hasData = true;
+				while(hasData) {
 					msg = clientInput.readLine();
 					
-					System.out.println("[INFO]: Dispatching this data " + msg + " to the server");
-					if(msg.equalsIgnoreCase("END")) {
-						break;
+					
+					if(!msg.equalsIgnoreCase("END") && (msg != null)) {
+						System.out.println("[INFO]: Dispatching this data " + msg + " to the server");
+						this.serversOutputs[this.serverIndex].println(msg);
+						this.serversOutputs[this.serverIndex].flush();
+						serverResponse = this.serversInputs[this.serverIndex].readLine();
+						clientOutput.println(serverResponse);
+						clientOutput.flush();
+						
 					}
-					this.serversOutputs[this.serverIndex].println(msg);
-					this.serversOutputs[this.serverIndex].flush();
-					serverResponse = this.serversInputs[this.serverIndex].readLine();
-					clientOutput.println(serverResponse);
-					clientOutput.flush();
+					else {
+						hasData = false;
+						System.out.println("[INFO]: Ending the connection");
+					}
+					
+					
 					
 				}
 				
 				clientOutput.close();
 				clientInput.close();
+				this.clientSocket.close();
 				this.serversOutputs[this.serverIndex].close();
 				this.serversInputs[this.serverIndex].close();
+				
 				
 			}	
 			catch (Exception e) {

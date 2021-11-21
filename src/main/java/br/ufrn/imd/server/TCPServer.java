@@ -58,11 +58,10 @@ public class TCPServer extends Thread {
 				String msg = "INIT, SERVER";
 //				(line = in.readLine()) != null
 				while(true) {
-					System.out.println("[INFO]: received this data: " + msg);
 					if(msg.equalsIgnoreCase("END")) {
 						break;
 					}
-					
+					System.out.println("[INFO]: received this data: " + msg);
 					out.println("REQUEST-ACCEPTED");
 					this.sendToDatabase(msg);
 					msg = in.readLine();
