@@ -14,12 +14,16 @@ public class Dispatcher implements Runnable {
 	protected int [] serversPorts;
 	protected PrintWriter  serverOutput;
 	protected BufferedReader serverInput;
+	protected BufferedReader  clientInput;
+	protected PrintWriter  clientOutput;
 	protected int serverIndex;
 	protected AtomicIntegerArray serversStatus;
+	protected int roundRobinInitialServer;
 	
 	
-	public Dispatcher(Socket incomingSocket) throws UnknownHostException, IOException {
+	public Dispatcher(Socket incomingSocket, int roundRobinInit) throws UnknownHostException, IOException {
 		this.clientSocket = incomingSocket;
+		this.roundRobinInitialServer = roundRobinInit;
 		this.serverIndex = 0;
 		this.server = null;
 		this.serversPorts = new int [2];
@@ -44,34 +48,40 @@ public class Dispatcher implements Runnable {
 		System.out.println("[INFO]: Dispatcher initialized");
 	}
 	
-	private int findFreeServer() {
+	private void findFreeServer() {
 		int freeServerPort = -1;
-		for(int i=0; i<2; i++) {
+		
+		int roundRobinIndex = this.roundRobinInitialServer;
+		int index = this.roundRobinInitialServer;
+		boolean isNotConnected = true;
+		while(isNotConnected) {
 			if(true) {
 				try {
-					
-					this.server = new Socket ("127.0.0.1", this.serversPorts[i]);
+	
+					this.server = new Socket ("127.0.0.1", this.serversPorts[index]);
 					this.serverInput = new BufferedReader(new InputStreamReader(this.server.getInputStream()));
 					this.serverOutput =  new PrintWriter(this.server.getOutputStream(), true);
 					//serversList.set(i, 0);
-					this.serverIndex = i;
+					isNotConnected = false;
 				
 					System.out.println("[INFO]: Found a free server on index: " + this.serverIndex);
-					return i;
+					return;
 					
 				} catch (Exception e) {
 					
 				}
 			}
+			roundRobinIndex++;
+			index = roundRobinIndex % 2;
+			
 		}
 		
-		return freeServerPort;
+		//return false;
 	}
 	
 	public void run() {
 		// TODO Auto-generated method stub
-		BufferedReader  clientInput;
-		PrintWriter  clientOutput;
+		
 		
 		
 		if(this.serverIndex != -1) {
@@ -114,7 +124,14 @@ public class Dispatcher implements Runnable {
 				
 			}	
 			catch (Exception e) {
-				
+				//System.err.println("[ERROR]: Fail to set/maintain the channel between client and server");
+				try {
+					clientOutput.close();
+					clientInput.close();
+					this.clientSocket.close();
+				}catch (Exception ee) {
+					System.err.println("[ERROR]: Unnable to close conection with the client");
+				}
 			}
 		}
 		

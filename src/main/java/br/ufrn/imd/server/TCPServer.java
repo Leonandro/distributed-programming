@@ -68,7 +68,7 @@ public class TCPServer extends Thread {
 				}
 				
 			}catch (Exception e) {
-				
+				//System.err.println("[ERROR]: Fail on the fly");
 			}
 			out.close();
 			//in.close();
