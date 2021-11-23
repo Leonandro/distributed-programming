@@ -34,7 +34,7 @@ public class TCPLoadBalancer {
 	    	try {
 		    	System.out.println("[INFO]: Waiting for one connection");
 		    	clientSocket = serverSocket.accept();
-		    	new Thread (new Dispatcher(clientSocket, (numberOfConnections % 2) )).start();
+		    	new Thread (new TCPDispatcher(clientSocket, (numberOfConnections % 2) )).start();
 		    	numberOfConnections++;
 	    	}catch (Exception e) {
 	    		System.err.println("[ERROR]: Fail to listen or to dispatch the request");

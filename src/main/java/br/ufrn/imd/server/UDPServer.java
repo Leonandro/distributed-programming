@@ -21,6 +21,7 @@ public class UDPServer extends Thread {
 	public void run () {
 		
 		while(true) {
+			 buf = new byte[1024];
 			 DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			 
 			 try {
@@ -31,7 +32,7 @@ public class UDPServer extends Thread {
 			 
 			 String receivedMsg = new String(packet.getData()).trim();
 			 
-			 if(!receivedMsg.equalsIgnoreCase("END")) {
+			 if(!receivedMsg.equalsIgnoreCase("DISPATCHER-CONNECT")) {
 				 System.out.println("[INFO]: received this data: " + receivedMsg);
 				 
 				 InetAddress address = packet.getAddress();
@@ -46,6 +47,22 @@ public class UDPServer extends Thread {
 	            	 this.serverSocket.send(returnPacket);
 	             }catch (Exception e) {
 	            	System.err.println("[ERROR]: Unnable to Send Back the packet"); 
+	             }
+			 }
+			 else {
+				 
+				 System.out.println("[INFO] Received alive ppacket");
+				 InetAddress address = packet.getAddress();
+	             int port = packet.getPort();
+	             
+	             byte [] returnMsg = new byte [1024];
+	             returnMsg = "CONNECTION-ACCEPTED".getBytes();
+	             DatagramPacket returnPacket = new DatagramPacket(returnMsg, returnMsg.length, address, port);
+	             
+	             try {
+	            	 this.serverSocket.send(returnPacket);
+	             }catch (Exception e) {
+	            	System.err.println("[ERROR]: Unnable to Send Back the alive packet"); 
 	             }
 			 }
 		

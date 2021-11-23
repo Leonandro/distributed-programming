@@ -16,7 +16,12 @@ public class UDPClient {
 		System.out.println(received);
 		received = client.sendEcho("ITS THE CLIENT");
 		System.out.println(received);
+		received = client.sendEcho("COMMON CUH");
+		System.out.println(received);
+		received = client.sendEcho("CHEEESE");
+		System.out.println(received);
 		client.close();
+		
 	}
 
 }
