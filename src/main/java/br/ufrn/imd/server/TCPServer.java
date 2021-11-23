@@ -32,14 +32,29 @@ public class TCPServer extends Thread {
 	
 		//Connect to database
 		try {
-			this.databaseSocket = new Socket("127.0.0.1", 8080);
+			this.databaseSocket = new Socket("127.0.0.1", 4480);
 			PrintWriter databaseOut = new PrintWriter(databaseSocket.getOutputStream(), true);
-			BufferedReader databaseIn = new BufferedReader(new InputStreamReader(databaseSocket.getInputStream()));
+			//BufferedReader databaseIn = new BufferedReader(new InputStreamReader(databaseSocket.getInputStream()));
 			
 			databaseOut.println(data);
 			databaseOut.flush();
+			return;
 		}catch(Exception e) {
-			System.err.println("[ERROR]: Unnable to connect to the database");
+			System.err.println("[ERROR]: Unnable to connect to primary the database");
+		}
+		
+		//Connect to database
+		try {
+			System.out.println("[INFO]: Trying to save on the secondary database");
+			this.databaseSocket = new Socket("127.0.0.1", 4481);
+			PrintWriter databaseOut = new PrintWriter(databaseSocket.getOutputStream(), true);
+			//BufferedReader databaseIn = new BufferedReader(new InputStreamReader(databaseSocket.getInputStream()));
+			
+			databaseOut.println(data);
+			databaseOut.flush();
+			return;
+		}catch(Exception e) {
+			System.err.println("[ERROR]: Unnable to connect to the secondary database");
 		}
 	}
 	
@@ -50,18 +65,18 @@ public class TCPServer extends Thread {
 			try {
 				
 				clientSocket = serverSocket.accept();
-				System.out.println("[INFO]: Connection established with the socket");
+				//System.out.println("[INFO]: Connection established with the socket");
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
 				
 				
-				String msg = "INIT, SERVER";
+				String msg = in.readLine();
 //				(line = in.readLine()) != null
 				while(true) {
 					if(msg.equalsIgnoreCase("END")) {
 						break;
 					}
-					System.out.println("[INFO]: received this data: " + msg);
+					System.out.println("[INFO]: received this data {" + msg + "} from 127.0.0.1:" + clientSocket.getPort());
 					out.println("REQUEST-ACCEPTED");
 					this.sendToDatabase(msg);
 					msg = in.readLine();

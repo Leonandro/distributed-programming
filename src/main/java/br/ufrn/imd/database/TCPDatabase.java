@@ -10,13 +10,16 @@ import java.util.ArrayList;
 
 public class TCPDatabase extends Thread{
 	private ServerSocket serverSocket;
-	private Socket clientSocket;
+	private Socket clientSocket, secondaryDatabaseSocket;
 	private PrintWriter out;
 	private BufferedReader in;
 	private ArrayList <String []> database;
+	private boolean isPrimary;
 	
 	public TCPDatabase (int portNumber, boolean isPrimary) {
 		this.database = new ArrayList <String[]> ();
+		this.isPrimary = isPrimary;
+		this.secondaryDatabaseSocket = null;
 		try {
 			this.serverSocket = new ServerSocket(portNumber);
 			System.out.println("[INFO]: Database Socket initialized on port: " + portNumber + " - " + isPrimary);
@@ -38,15 +41,36 @@ public class TCPDatabase extends Thread{
 			}
 			
 			try {
-				String [] data = in.readLine().split(",");
-				this.database.add(data);
-				System.out.println("[INFO]: Storing the data - " + data[1]);
+				String data = in.readLine();
+				
+				this.database.add(data.split(","));
+				System.out.println("[INFO]: Storing the data - " + data);
+				
+				if(this.isPrimary) {
+					this.sendToSecondayDatabase(data);
+				}
 			}catch (Exception e) {
 				System.err.println("[ERROR]: Unnable to parse the data");
 			}
 			
 			out.close();
 			
+		}
+	}
+	
+	private void sendToSecondayDatabase (String data) {
+		
+		
+		//Connect to database
+		try {
+			this.secondaryDatabaseSocket = new Socket("127.0.0.1", 4481);
+			PrintWriter databaseOut = new PrintWriter(this.secondaryDatabaseSocket.getOutputStream(), true);
+			BufferedReader databaseIn = new BufferedReader(new InputStreamReader(this.secondaryDatabaseSocket.getInputStream()));
+			
+			databaseOut.println(data);
+			databaseOut.flush();
+		}catch(Exception e) {
+			System.err.println("[ERROR]: Unnable to connect to the secondary database");
 		}
 	}
 	
